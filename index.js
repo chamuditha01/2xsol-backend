@@ -36,11 +36,19 @@ const crypto  = require('crypto');
 const bs58    = require('bs58').default;
 const { createClient } = require('@supabase/supabase-js');
 
+function requireEnv(name) {
+    const value = process.env[name];
+    if (!value) {
+        throw new Error(`Missing required environment variable: ${name}`);
+    }
+    return value;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // CONFIG
 // ─────────────────────────────────────────────────────────────────────────────
-const PROGRAM_ID       = new PublicKey(process.env.PROGRAM_ID);
-const COMMISSION_ACC   = new PublicKey(process.env.COMMISSION_ACC);
+const PROGRAM_ID       = new PublicKey(requireEnv('PROGRAM_ID'));
+const COMMISSION_ACC   = new PublicKey(requireEnv('COMMISSION_ACC'));
 const RPC_URL          = process.env.DEVNET_URL || 'https://api.devnet.solana.com';
 const PORT             = process.env.PORT || 3001;
 const SETTLEMENTS_TABLE = process.env.SETTLEMENTS_TABLE || 'leaderboard';
@@ -57,16 +65,15 @@ const GAME_DATA_SIZE     = 200;  // allocated size; serialized is 184
 // ─────────────────────────────────────────────────────────────────────────────
 // INIT
 // ─────────────────────────────────────────────────────────────────────────────
+requireEnv('SUPABASE_URL');
+requireEnv('SUPABASE_SERVICE_ROLE_KEY');
+
 const supabase = createClient(
     process.env.SUPABASE_URL,
     process.env.SUPABASE_SERVICE_ROLE_KEY,
 );
 
-if (!process.env.HOUSE_SECRET_KEY) {
-    console.error('❌  HOUSE_SECRET_KEY missing in .env');
-    process.exit(1);
-}
-const houseKeypair = Keypair.fromSecretKey(bs58.decode(process.env.HOUSE_SECRET_KEY));
+const houseKeypair = Keypair.fromSecretKey(bs58.decode(requireEnv('HOUSE_SECRET_KEY')));
 const connection   = new Connection(RPC_URL, 'confirmed');
 
 console.log(`🏠 House wallet: ${houseKeypair.publicKey.toBase58()}`);
