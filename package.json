@@ -20,7 +20,9 @@
     "express": "^5.2.1",
     "fs": "^0.0.1-security",
     "path": "^0.12.7",
+    "typescript": "^6.0.3",
     "tweetnacl": "^1.0.3",
+    "utf-8-validate": "^5.0.10",
     "ws": "^8.21.0"
   }
 }
